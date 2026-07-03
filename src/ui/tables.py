@@ -1,5 +1,6 @@
 """
 Output-table formatting: domain results -> outputs/*.csv.
+Align column names with specification, round percentages to 4 decimal places.
 """
 
 from pathlib import Path
