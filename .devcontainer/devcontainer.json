@@ -1,0 +1,6 @@
+{
+  "name": "miraclib-cell-counts-analysis",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "forwardPorts": [8501],
+  "postCreateCommand": "make setup"
+}
