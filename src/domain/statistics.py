@@ -64,31 +64,28 @@ def compare_responders(freq_with_response: pd.DataFrame) -> pd.DataFrame:
     Cliff's delta effect size, and BH-adjusted q-value.
     """
     rows = []
+    present = set(freq_with_response["population"].unique())
     for population in POPULATION_COLUMNS:
-        group = freq_with_response.loc[freq_with_response["population"] ==
-                                       population]
-    responders = group.loc[group["response"] ==
-                           Response.YES, "percentage"].to_numpy()
-    non_responders = group.loc[group["response"] ==
-                               Response.NO, "percentage"].to_numpy()
+        if population not in present:
+            continue
+        group = freq_with_response.loc[freq_with_response["population"] == population]
+        responders = group.loc[group["response"] == Response.YES, "percentage"].to_numpy()
+        non_responders = group.loc[group["response"] == Response.NO, "percentage"].to_numpy()
 
-    u_stat, p_value = mannwhitneyu(responders,
-                                   non_responders, alternative="two-sided")
+        u_stat, p_value = mannwhitneyu(responders, non_responders, alternative="two-sided")
 
-    rows.append({
-        "population": population,
-        "n_responder": len(responders),
-        "n_non_responder": len(non_responders),
-        "median_responder": np.median(responders),
-        "median_non_responder":
-            np.median(non_responders),
-        "iqr_responder": _iqr(responders),
-        "iqr_non_responder": _iqr(non_responders),
-        "u_statistic": u_stat,
-        "p_value": p_value,
-        "cliffs_delta": _cliffs_delta(responders,
-                                      non_responders, u_stat),
-    })
+        rows.append({
+            "population": population,
+            "n_responder": len(responders),
+            "n_non_responder": len(non_responders),
+            "median_responder": np.median(responders),
+            "median_non_responder": np.median(non_responders),
+            "iqr_responder": _iqr(responders),
+            "iqr_non_responder": _iqr(non_responders),
+            "u_statistic": u_stat,
+            "p_value": p_value,
+            "cliffs_delta": _cliffs_delta(responders, non_responders, u_stat),
+        })
 
     result = pd.DataFrame(rows)
     result["q_value"] = false_discovery_control(result["p_value"], method="bh")
