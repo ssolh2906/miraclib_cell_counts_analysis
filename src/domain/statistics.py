@@ -17,17 +17,17 @@ from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import StandardScaler
 
 from src.domain.frequency import compute_frequencies
-from src.domain.vocab import BASELINE, Condition, Response, SampleType, Treatment
+from src.domain.vocab import BASELINE, POPULATION_COLUMNS, Condition, Response, SampleType, Treatment
 
 
 def filter_predictive_subset(annotated_counts: pd.DataFrame) -> pd.DataFrame:
     """melanoma + miraclib + PBMC + baseline (t=0), responder/non-responder only."""
     mask = (
-        (annotated_counts["condition"] == Condition.MELANOMA)
-        & (annotated_counts["treatment"] == Treatment.MIRACLIB)
-        & (annotated_counts["sample_type"] == SampleType.PBMC)
-        & (annotated_counts["time_from_treatment_start"] == BASELINE)
-        & (annotated_counts["response"].isin([Response.YES, Response.NO]))
+            (annotated_counts["condition"] == Condition.MELANOMA)
+            & (annotated_counts["treatment"] == Treatment.MIRACLIB)
+            & (annotated_counts["sample_type"] == SampleType.PBMC)
+            & (annotated_counts["time_from_treatment_start"] == BASELINE)
+            & (annotated_counts["response"].isin([Response.YES, Response.NO]))
     )
     return annotated_counts.loc[mask].reset_index(drop=True)
 
@@ -53,33 +53,46 @@ def _iqr(values: np.ndarray) -> float:
     return q75 - q25
 
 
-def compare_responders(freq_with_response: pd.DataFrame) -> pd.DataFrame:
+def compare_responders(freq_with_response: pd.DataFrame) ->
+    pd.DataFrame:
+
     """
-    Per-population Mann-Whitney U test, responder (yes) vs non-responder (no).
-    Returns one row per population: n per group, medians, IQRs, U, p-value,
+    Per-population Mann-Whitney U test, responder (yes) vs
+    non-responder (no).
+    Returns one row per population (fixed order:
+    POPULATION_COLUMNS, the original
+    CSV column order, matching plots.py): n per group,
+    medians, IQRs, U, p-value,
     Cliff's delta effect size, and BH-adjusted q-value.
     """
     rows = []
-    for population, group in freq_with_response.groupby("population"):
-        responders = group.loc[group["response"] == Response.YES, "percentage"].to_numpy()
-        non_responders = group.loc[group["response"] == Response.NO, "percentage"].to_numpy()
+    for population in POPULATION_COLUMNS:
+        group = freq_with_response.loc[freq_with_response["population"] ==
+                                       population]
+    responders = group.loc[group["response"] ==
+                           Response.YES, "percentage"].to_numpy()
+    non_responders = group.loc[group["response"] ==
+                               Response.NO, "percentage"].to_numpy()
 
-        u_stat, p_value = mannwhitneyu(responders, non_responders, alternative="two-sided")
+    u_stat, p_value = mannwhitneyu(responders,
+                                   non_responders, alternative="two-sided")
 
-        rows.append({
-            "population": population,
-            "n_responder": len(responders),
-            "n_non_responder": len(non_responders),
-            "median_responder": np.median(responders),
-            "median_non_responder": np.median(non_responders),
-            "iqr_responder": _iqr(responders),
-            "iqr_non_responder": _iqr(non_responders),
-            "u_statistic": u_stat,
-            "p_value": p_value,
-            "cliffs_delta": _cliffs_delta(responders, non_responders, u_stat),
-        })
+    rows.append({
+        "population": population,
+        "n_responder": len(responders),
+        "n_non_responder": len(non_responders),
+        "median_responder": np.median(responders),
+        "median_non_responder":
+            np.median(non_responders),
+        "iqr_responder": _iqr(responders),
+        "iqr_non_responder": _iqr(non_responders),
+        "u_statistic": u_stat,
+        "p_value": p_value,
+        "cliffs_delta": _cliffs_delta(responders,
+                                      non_responders, u_stat),
+    })
 
-    result = pd.DataFrame(rows).sort_values("p_value").reset_index(drop=True)
+    result = pd.DataFrame(rows)
     result["q_value"] = false_discovery_control(result["p_value"], method="bh")
     return result
 
