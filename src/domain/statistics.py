@@ -12,6 +12,7 @@ one per timepoint, which are not independent observations).
 import numpy as np
 import pandas as pd
 from scipy.stats import false_discovery_control, mannwhitneyu
+from sklearn.metrics import roc_auc_score
 
 from src.domain.frequency import compute_frequencies
 from src.domain.vocab import BASELINE, Condition, Response, SampleType, Treatment
@@ -79,3 +80,21 @@ def compare_responders(freq_with_response: pd.DataFrame) -> pd.DataFrame:
     result = pd.DataFrame(rows).sort_values("p_value").reset_index(drop=True)
     result["q_value"] = false_discovery_control(result["p_value"], method="bh")
     return result
+
+
+def population_auc(freq_with_response: pd.DataFrame) -> pd.DataFrame:
+    """
+    Per-population ROC-AUC: how well does this population's frequency alone
+    separate responders from non-responders? responder ('yes') is the positive class.
+
+    `auc` > 0.5 means higher frequency predicts responder; < 0.5 means higher
+    frequency predicts non-responder. `auc_abs` = max(auc, 1-auc) is separability
+    regardless of direction, so populations can be ranked by predictive strength.
+    """
+    rows = []
+    for population, group in freq_with_response.groupby("population"):
+        y_true = (group["response"] == Response.YES).astype(int)
+        auc = roc_auc_score(y_true, group["percentage"])
+        rows.append({"population": population, "auc": auc, "auc_abs": max(auc, 1 - auc)})
+
+    return pd.DataFrame(rows).sort_values("auc_abs", ascending=False).reset_index(drop=True)
