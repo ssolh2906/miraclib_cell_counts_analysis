@@ -28,3 +28,9 @@ def save_response_stats(stats: pd.DataFrame, path: Path = OUTPUTS_DIR / "respons
     out[round_cols] = out[round_cols].round(4)
     path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(path, index=False)
+
+
+def save_subset_summary(summary: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_summary.csv") -> None:
+    """Part 4 baseline subset: (metric, group, value) rows, incl. headline B-cell mean."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(path, index=False)
