@@ -20,7 +20,7 @@ def get_annotated_cell_counts(conn: sqlite3.Connection) -> pd.DataFrame:
     """
     query = """
         SELECT
-            subj.subject_id, subj.condition, subj.age, subj.sex,
+            subj.subject_id, subj.project_id, subj.condition, subj.age, subj.sex,
             subj.treatment, subj.response,
             sm.sample_id, sm.sample_type, sm.time_from_treatment_start,
             cc.population, cc.cell_count
