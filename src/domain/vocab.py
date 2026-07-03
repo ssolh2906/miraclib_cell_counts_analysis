@@ -25,7 +25,6 @@ class Treatment(StrEnum):
 class Response(StrEnum):
     YES = "yes"
     NO = "no"
-    NAN = "NaN"
 
 
 class SampleType(StrEnum):

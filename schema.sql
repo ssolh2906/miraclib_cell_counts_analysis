@@ -8,7 +8,7 @@
 --      Adding a new population needs no schema change.
 --   3. Raw counts only. Percentages (Part 2) are derived via the cell_frequencies VIEW
 --      (single source of truth — never store computed frequencies).
---   4. response is TEXT — yes, no, none (3-state).
+--   4. response is nullable TEXT — 'yes'/'no'/NULL for healthy/none.
 --   5. CHECK constraints enforce controlled vocabulary; population is enforced by FK.
 --   6. Indexes on every FK column for scale (thousands of samples, hundreds of projects).
 
