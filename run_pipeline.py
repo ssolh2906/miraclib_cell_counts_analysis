@@ -15,8 +15,9 @@ from src.domain.statistics import (
     pca_projection,
     population_auc,
 )
+from src.domain.subsets import filter_baseline_subset, summarize_subset
 from src.ui.plots import save_boxplots, save_pca_scatter, save_roc_curves
-from src.ui.tables import save_cell_frequencies, save_response_stats
+from src.ui.tables import save_cell_frequencies, save_response_stats, save_subset_summary
 
 DB_PATH = Path(__file__).resolve().parent / "cell_counts.db"
 
@@ -44,11 +45,20 @@ def analyze_responder_differences(conn: sqlite3.Connection) -> None:
     save_pca_scatter(pca)
 
 
+def analyze_baseline_subset(conn: sqlite3.Connection) -> None:
+    """Part 4: melanoma + miraclib + PBMC baseline subset summary."""
+    annotated_counts = get_annotated_cell_counts(conn)
+    subset = filter_baseline_subset(annotated_counts)
+    summary = summarize_subset(subset)
+    save_subset_summary(summary)
+
+
 def main() -> None:
     conn = sqlite3.connect(str(DB_PATH))
     try:
         generate_frequency_summary(conn)
         analyze_responder_differences(conn)
+        analyze_baseline_subset(conn)
     finally:
         conn.close()
 
