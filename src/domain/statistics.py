@@ -53,9 +53,7 @@ def _iqr(values: np.ndarray) -> float:
     return q75 - q25
 
 
-def compare_responders(freq_with_response: pd.DataFrame) ->
-    pd.DataFrame:
-
+def compare_responders(freq_with_response: pd.DataFrame) -> pd.DataFrame:
     """
     Per-population Mann-Whitney U test, responder (yes) vs
     non-responder (no).
