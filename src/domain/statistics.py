@@ -12,7 +12,9 @@ one per timepoint, which are not independent observations).
 import numpy as np
 import pandas as pd
 from scipy.stats import false_discovery_control, mannwhitneyu
+from sklearn.decomposition import PCA
 from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import StandardScaler
 
 from src.domain.frequency import compute_frequencies
 from src.domain.vocab import BASELINE, Condition, Response, SampleType, Treatment
@@ -98,3 +100,29 @@ def population_auc(freq_with_response: pd.DataFrame) -> pd.DataFrame:
         rows.append({"population": population, "auc": auc, "auc_abs": max(auc, 1 - auc)})
 
     return pd.DataFrame(rows).sort_values("auc_abs", ascending=False).reset_index(drop=True)
+
+
+def pca_projection(freq_with_response: pd.DataFrame) -> pd.DataFrame:
+    """
+    2D PCA of each sample's 5-population frequency profile, to see whether
+    responders/non-responders separate on the *overall* profile rather than
+    any single population. Standardized first so no single high-frequency
+    population (e.g. cd4_t_cell) dominates the variance just by having a
+    bigger scale.
+    """
+    wide = freq_with_response.pivot(index="sample_id", columns="population", values="percentage")
+    response_by_sample = (
+        freq_with_response[["sample_id", "response"]].drop_duplicates().set_index("sample_id")
+    )
+    wide = wide.join(response_by_sample)
+
+    features = wide.drop(columns="response")
+    scaled = StandardScaler().fit_transform(features)
+    components = PCA(n_components=2, random_state=0).fit_transform(scaled)
+
+    return pd.DataFrame({
+        "sample_id": wide.index,
+        "pc1": components[:, 0],
+        "pc2": components[:, 1],
+        "response": wide["response"].to_numpy(),
+    }).reset_index(drop=True)
