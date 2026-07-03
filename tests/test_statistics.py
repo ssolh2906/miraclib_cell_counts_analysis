@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import mannwhitneyu
 
-from src.domain.statistics import _cliffs_delta, compare_responders, population_auc
+from src.domain.statistics import _cliffs_delta, compare_responders, pca_projection, population_auc
 
 
 def test_cliffs_delta_complete_separation():
@@ -90,3 +90,35 @@ def test_population_auc_no_signal():
     )
     row = population_auc(df).iloc[0]
     assert abs(row["auc"] - 0.5) < 0.2
+
+
+def _toy_multi_population_frequencies() -> pd.DataFrame:
+    """3 populations x 6 samples (3 responder, 3 non-responder), for PCA tests."""
+    rng = np.random.default_rng(42)
+    rows = []
+    for i in range(6):
+        response = "yes" if i < 3 else "no"
+        for population in ["b_cell", "cd4_t_cell", "nk_cell"]:
+            rows.append({
+                "sample_id": f"s{i}",
+                "population": population,
+                "percentage": rng.uniform(5, 40),
+                "response": response,
+            })
+    return pd.DataFrame(rows)
+
+
+def test_pca_projection_shape():
+    """One row per sample, with pc1/pc2/response columns."""
+    df = _toy_multi_population_frequencies()
+    result = pca_projection(df)
+    assert list(result.columns) == ["sample_id", "pc1", "pc2", "response"]
+    assert len(result) == 6
+
+
+def test_pca_projection_deterministic():
+    """Same input -> same PCA coordinates (fixed random_state)."""
+    df = _toy_multi_population_frequencies()
+    first = pca_projection(df)
+    second = pca_projection(df)
+    pd.testing.assert_frame_equal(first, second)
