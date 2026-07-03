@@ -65,6 +65,29 @@ def save_boxplots(freq_with_response: pd.DataFrame, path: Path = OUTPUTS_DIR / "
     plt.close(fig)
 
 
+def save_pca_scatter(pca: pd.DataFrame, path: Path = OUTPUTS_DIR / "pca.png") -> None:
+    """2D PCA scatter of each sample's population profile, responder vs non-responder."""
+    fig, ax = plt.subplots(figsize=(6, 6))
+
+    for response, color, label in [("yes", COLOR_RESPONDER, "responder"), ("no", COLOR_NON_RESPONDER, "non-responder")]:
+        group = pca.loc[pca["response"] == response]
+        ax.scatter(group["pc1"], group["pc2"], color=color, s=14, alpha=0.6, label=label)
+
+    ax.set_xlabel("PC1")
+    ax.set_ylabel("PC2")
+    ax.set_title("PCA of population profile: responder vs non-responder (baseline, t=0)")
+    ax.legend(frameon=False)
+    ax.axhline(0, color="#e1e0d9", linewidth=0.8, zorder=0)
+    ax.axvline(0, color="#e1e0d9", linewidth=0.8, zorder=0)
+    for spine in ["top", "right"]:
+        ax.spines[spine].set_visible(False)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
 def save_roc_curves(
     freq_with_response: pd.DataFrame,
     auc_table: pd.DataFrame,
