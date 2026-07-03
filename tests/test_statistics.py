@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import mannwhitneyu
 
-from src.domain.statistics import _cliffs_delta, compare_responders
+from src.domain.statistics import _cliffs_delta, compare_responders, population_auc
 
 
 def test_cliffs_delta_complete_separation():
@@ -58,3 +58,35 @@ def test_compare_responders_no_difference():
     row = result.iloc[0]
     assert row["p_value"] > 0.5
     assert abs(row["cliffs_delta"]) < 0.3
+
+
+def test_population_auc_perfect_separation():
+    """Responder % always higher -> this population perfectly predicts response -> AUC = 1.0."""
+    df = _toy_frequencies(
+        responder_values=[30, 32, 35, 33, 31],
+        non_responder_values=[10, 12, 15, 13, 11],
+    )
+    row = population_auc(df).iloc[0]
+    assert row["auc"] == 1.0
+    assert row["auc_abs"] == 1.0
+
+
+def test_population_auc_reversed_still_fully_separable():
+    """Responder % always lower -> AUC = 0.0 (wrong direction), but auc_abs still shows full separability."""
+    df = _toy_frequencies(
+        responder_values=[10, 12, 15, 13, 11],
+        non_responder_values=[30, 32, 35, 33, 31],
+    )
+    row = population_auc(df).iloc[0]
+    assert row["auc"] == 0.0
+    assert row["auc_abs"] == 1.0
+
+
+def test_population_auc_no_signal():
+    """Interleaved/overlapping values -> AUC near chance level (0.5)."""
+    df = _toy_frequencies(
+        responder_values=[10, 20, 30, 40, 50],
+        non_responder_values=[15, 25, 35, 45, 55],
+    )
+    row = population_auc(df).iloc[0]
+    assert abs(row["auc"] - 0.5) < 0.2
