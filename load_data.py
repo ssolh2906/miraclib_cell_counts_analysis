@@ -1,4 +1,27 @@
-# Initializes the database with your schema.
-# Loads all rows from cell-count.csv.
-# When executed with `python load_data.py`, it should create a SQLite database file (`.db` extension) in the repository root.
-# The script should be executable directly without command-line arguments or module-style execution (`python -m`).
+"""
+Part 1 entry point. Run with `python load_data.py` (no args, no -m) from repo root.
+Creates cell_counts.db in the repo root and loads data/cell-count.csv into it.
+"""
+
+from pathlib import Path
+
+from src.data.database import get_connection, init_schema
+from src.data.loader import load_into_db
+
+DB_PATH = Path(__file__).resolve().parent / "cell_counts.db"
+
+
+def main() -> None:
+    if DB_PATH.exists():
+        DB_PATH.unlink()
+
+    conn = get_connection(str(DB_PATH))
+    try:
+        init_schema(conn)
+        load_into_db(conn)
+    finally:
+        conn.close()
+
+
+if __name__ == "__main__":
+    main()
