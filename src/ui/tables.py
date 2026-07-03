@@ -16,3 +16,15 @@ def save_cell_frequencies(frequencies: pd.DataFrame, path: Path = OUTPUTS_DIR / 
     out["percentage"] = out["percentage"].round(4)
     path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(path, index=False)
+
+
+def save_response_stats(stats: pd.DataFrame, path: Path = OUTPUTS_DIR / "response_stats.csv") -> None:
+    """Part 3 Mann-Whitney(p)/effect-size(cliifs_delta)/BH results(q), one row per population."""
+    round_cols = [
+        "median_responder", "median_non_responder", "iqr_responder", "iqr_non_responder",
+        "cliffs_delta", "p_value", "q_value",
+    ]
+    out = stats.copy()
+    out[round_cols] = out[round_cols].round(4)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(path, index=False)
