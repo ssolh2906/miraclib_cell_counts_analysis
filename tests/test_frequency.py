@@ -19,7 +19,7 @@ def test_hand_calculated_case():
 
 
 def test_percentages_sum_to_100_per_sample():
-    """Sum of percentages should be always 100 per samples"""
+    """Oracle test. Sum of percentages should be always 100 per samples"""
     df = pd.DataFrame({
         "sample_id":  ["s1","s1","s2","s2"],
         "population": ["b_cell","nk_cell","b_cell","nk_cell"],
