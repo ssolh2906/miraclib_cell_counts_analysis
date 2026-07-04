@@ -22,6 +22,10 @@ def render() -> None:
     df = load_cell_frequencies()
     df["response"] = df["response"].fillna("n/a")
 
+    # Placeholder positioned above the filters; filled in below once `filtered` exists
+    # (Streamlit renders a container at its declaration point, not its fill point).
+    spec_container = st.container()
+
     st.subheader("Filters")
     r1 = st.columns(4)
     condition = _multiselect(r1[0], "Condition", df["condition"], "f_condition")
@@ -48,6 +52,19 @@ def render() -> None:
     if filtered.empty:
         st.warning("No samples match the current filters.")
         return
+
+    with spec_container:
+        st.subheader("Frequency table (Part 2 output)")
+        st.caption("Long format required by the spec: one row per (sample, population).")
+        spec_cols = ["sample", "total_count", "population", "count", "percentage"]
+        spec_table = filtered[spec_cols].reset_index(drop=True)
+        st.dataframe(spec_table, use_container_width=True, hide_index=True)
+        st.download_button(
+            "Download frequency table (CSV)",
+            spec_table.to_csv(index=False).encode("utf-8"),
+            file_name="cell_frequencies_spec.csv",
+            mime="text/csv",
+        )
 
     st.divider()
 
