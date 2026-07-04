@@ -1,6 +1,10 @@
 import streamlit as st
 
-from components.data_loading import load_baseline_samples, load_cohort_counts, load_population_means
+from components.data_loading import (
+    load_cohort_counts,
+    load_melanoma_miraclib_pbmc_baseline_samples,
+    load_population_means,
+)
 
 
 def render() -> None:
@@ -13,10 +17,10 @@ def render() -> None:
     ].iloc[0]
     st.metric("Mean B cells — melanoma males, responders, baseline", f"{headline:.2f}")
 
-    baseline_samples = load_baseline_samples()
+    samples = load_melanoma_miraclib_pbmc_baseline_samples()
     st.subheader("Identified samples")
-    st.caption(f"{len(baseline_samples)} samples")
-    st.dataframe(baseline_samples, use_container_width=True)
+    st.caption(f"{len(samples)} samples")
+    st.dataframe(samples, use_container_width=True)
 
     st.subheader("Cohort composition")
     st.dataframe(load_cohort_counts(), use_container_width=True)

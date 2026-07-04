@@ -10,7 +10,7 @@ import pandas as pd
 from src.domain.vocab import BASELINE, Condition, SampleType, Treatment
 
 
-def filter_baseline_subset(annotated_counts: pd.DataFrame) -> pd.DataFrame:
+def filter_melanoma_miraclib_pbmc_baseline(annotated_counts: pd.DataFrame) -> pd.DataFrame:
     """melanoma + miraclib + PBMC + baseline (t=0). One row per (sample, population)."""
     mask = (
             (annotated_counts["condition"] == Condition.MELANOMA)

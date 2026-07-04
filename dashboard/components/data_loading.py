@@ -23,8 +23,8 @@ def load_response_stats() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_baseline_samples() -> pd.DataFrame:
-    return pd.read_csv(OUTPUTS_DIR / "subset_baseline_samples.csv")
+def load_melanoma_miraclib_pbmc_baseline_samples() -> pd.DataFrame:
+    return pd.read_csv(OUTPUTS_DIR / "melanoma_miraclib_pbmc_baseline_samples.csv")
 
 
 @st.cache_data

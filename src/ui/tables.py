@@ -30,8 +30,8 @@ def save_response_stats(stats: pd.DataFrame, path: Path = OUTPUTS_DIR / "respons
     out.to_csv(path, index=False)
 
 
-def save_baseline_samples(
-    samples: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_baseline_samples.csv"
+def save_melanoma_miraclib_pbmc_baseline_samples(
+    samples: pd.DataFrame, path: Path = OUTPUTS_DIR / "melanoma_miraclib_pbmc_baseline_samples.csv"
 ) -> None:
     """Part 4 step 1: melanoma + miraclib + PBMC samples at baseline (t=0), one row per sample."""
     path.parent.mkdir(parents=True, exist_ok=True)

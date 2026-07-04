@@ -44,7 +44,7 @@ def get_baseline_miraclib_melanoma_pbmc_samples(conn: sqlite3.Connection) -> pd.
     return pd.read_sql(query, conn)
 
 
-def get_baseline_samples_per_project(conn: sqlite3.Connection) -> pd.DataFrame:
+def get_melanoma_miraclib_pbmc_baseline_samples_per_project(conn: sqlite3.Connection) -> pd.DataFrame:
     """Part 4 extension: sample count per project, within the baseline subset."""
     query = """
         SELECT subj.project_id, COUNT(*) AS sample_count
@@ -57,7 +57,7 @@ def get_baseline_samples_per_project(conn: sqlite3.Connection) -> pd.DataFrame:
     return pd.read_sql(query, conn)
 
 
-def get_baseline_subjects_per_response(conn: sqlite3.Connection) -> pd.DataFrame:
+def get_melanoma_miraclib_pbmc_baseline_subjects_per_response(conn: sqlite3.Connection) -> pd.DataFrame:
     """Part 4 extension: responder/non-responder subject count, within the baseline subset."""
     query = """
         SELECT subj.response, COUNT(DISTINCT subj.subject_id) AS subject_count
@@ -70,7 +70,7 @@ def get_baseline_subjects_per_response(conn: sqlite3.Connection) -> pd.DataFrame
     return pd.read_sql(query, conn)
 
 
-def get_baseline_subjects_per_sex(conn: sqlite3.Connection) -> pd.DataFrame:
+def get_melanoma_miraclib_pbmc_baseline_subjects_per_sex(conn: sqlite3.Connection) -> pd.DataFrame:
     """Part 4 extension: male/female subject count, within the baseline subset."""
     query = """
         SELECT subj.sex, COUNT(DISTINCT subj.subject_id) AS subject_count
