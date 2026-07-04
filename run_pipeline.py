@@ -21,11 +21,23 @@ from src.domain.statistics import (
     pca_projection,
     population_auc,
 )
-from src.domain.subsets import combine_cohort_counts, filter_melanoma_miraclib_pbmc_baseline, summarize_population_means
-from src.ui.plots import save_boxplots, save_pca_scatter, save_roc_curves
+from src.domain.subsets import (
+    combine_cohort_counts,
+    compare_responders_by_sex_melanoma_miraclib_pbmc_baseline,
+    compute_melanoma_miraclib_pbmc_baseline_response_frequencies,
+    filter_melanoma_miraclib_pbmc_baseline,
+    summarize_population_means,
+)
+from src.ui.plots import (
+    save_boxplots,
+    save_melanoma_miraclib_pbmc_baseline_boxplots_by_sex,
+    save_pca_scatter,
+    save_roc_curves,
+)
 from src.ui.tables import (
     save_cell_frequencies,
     save_cohort_counts,
+    save_melanoma_miraclib_pbmc_baseline_response_stats,
     save_melanoma_miraclib_pbmc_baseline_samples,
     save_population_means,
     save_response_stats,
@@ -73,8 +85,15 @@ def analyze_melanoma_miraclib_pbmc_baseline(conn: sqlite3.Connection) -> None:
     save_cohort_counts(counts)
 
     annotated_counts = get_annotated_cell_counts(conn)
-    subset = filter_melanoma_miraclib_pbmc_baseline(annotated_counts)
-    save_population_means(summarize_population_means(subset))
+    melanoma_miraclib_pbmc_baseline = filter_melanoma_miraclib_pbmc_baseline(annotated_counts)
+    save_population_means(summarize_population_means(melanoma_miraclib_pbmc_baseline))
+    save_melanoma_miraclib_pbmc_baseline_response_stats(
+        compare_responders_by_sex_melanoma_miraclib_pbmc_baseline(melanoma_miraclib_pbmc_baseline)
+    )
+    baseline_response_frequencies = compute_melanoma_miraclib_pbmc_baseline_response_frequencies(
+        melanoma_miraclib_pbmc_baseline
+    )
+    save_melanoma_miraclib_pbmc_baseline_boxplots_by_sex(baseline_response_frequencies)
 
 
 def main() -> None:

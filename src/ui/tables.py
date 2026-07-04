@@ -61,3 +61,15 @@ def save_population_means(
     """Part 4 baseline subset: mean cell count per population, by sex and response."""
     path.parent.mkdir(parents=True, exist_ok=True)
     means.to_csv(path, index=False)
+
+
+def save_melanoma_miraclib_pbmc_baseline_response_stats(
+    stats: pd.DataFrame,
+    path: Path = OUTPUTS_DIR / "melanoma_miraclib_pbmc_baseline_response_stats.csv",
+) -> None:
+    """Part 4 baseline subset: sex-stratified responder vs non-responder frequency (%) stats."""
+    round_cols = ["median_responder", "median_non_responder", "difference", "p_value", "q_value"]
+    out = stats.copy()
+    out[round_cols] = out[round_cols].round(4)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(path, index=False)

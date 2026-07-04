@@ -37,8 +37,17 @@ def load_population_means() -> pd.DataFrame:
     return pd.read_csv(OUTPUTS_DIR / "subset_population_means.csv")
 
 
+@st.cache_data
+def load_melanoma_miraclib_pbmc_baseline_response_stats() -> pd.DataFrame:
+    return pd.read_csv(OUTPUTS_DIR / "melanoma_miraclib_pbmc_baseline_response_stats.csv")
+
+
 def boxplots_path() -> Path:
     return OUTPUTS_DIR / "boxplots.png"
+
+
+def melanoma_miraclib_pbmc_baseline_boxplots_by_sex_path() -> Path:
+    return OUTPUTS_DIR / "melanoma_miraclib_pbmc_baseline_boxplots_by_sex.png"
 
 
 def pca_path() -> Path:

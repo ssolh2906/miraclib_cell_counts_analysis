@@ -7,7 +7,10 @@ build a matplotlib Figure from an already-loaded DataFrame.
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.domain.vocab import POPULATION_COLORS
+from src.domain.vocab import POPULATION_COLORS, POPULATION_COLUMNS
+
+COLOR_MALE = "#3d5a80"
+COLOR_FEMALE = "#e07a5f"
 
 
 def cliffs_delta_chart(response_stats: pd.DataFrame) -> plt.Figure:
@@ -64,6 +67,37 @@ def p_value_chart(response_stats: pd.DataFrame) -> plt.Figure:
     ax.set_ylabel("p-value (Mann-Whitney U)")
     ax.set_title("Raw significance by population, baseline (t=0)")
     ax.set_ylim(0, max(1.0, response_stats["p_value"].max() * 1.1))
+    for spine in ["top", "right"]:
+        ax.spines[spine].set_visible(False)
+
+    fig.tight_layout()
+    return fig
+
+
+def melanoma_miraclib_pbmc_baseline_p_value_chart(baseline_response_stats: pd.DataFrame) -> plt.Figure:
+    """Grouped bar chart: raw p-value per population, split by sex (M vs F), with a
+    significance line at 0.05. Companion to the sex-faceted baseline boxplot."""
+    x = list(range(len(POPULATION_COLUMNS)))
+
+    fig, ax = plt.subplots(figsize=(6, 3.5))
+    for offset, sex, color in [(-0.18, "M", COLOR_MALE), (0.18, "F", COLOR_FEMALE)]:
+        sex_stats = (
+            baseline_response_stats.loc[baseline_response_stats["sex"] == sex]
+            .set_index("population")
+            .reindex(POPULATION_COLUMNS)
+        )
+        ax.bar([xi + offset for xi in x], sex_stats["p_value"], width=0.32, color=color, label=sex)
+
+    ax.axhline(0.05, color="#c0392b", linewidth=1.2, linestyle="--")
+    ax.annotate("p = 0.05", (len(x) - 1, 0.05), xytext=(0, 4), textcoords="offset points",
+                ha="right", fontsize=8, color="#c0392b")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(POPULATION_COLUMNS, rotation=30, ha="right", fontsize=8)
+    ax.set_ylabel("p-value (Mann-Whitney U)")
+    ax.set_title("Raw significance by population and sex, baseline (t=0)")
+    ax.set_ylim(0, max(1.0, baseline_response_stats["p_value"].max() * 1.1))
+    ax.legend(frameon=False, fontsize=8)
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
 

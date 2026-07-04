@@ -61,6 +61,58 @@ def save_boxplots(freq_with_response: pd.DataFrame, path: Path = OUTPUTS_DIR / "
     plt.close(fig)
 
 
+def save_melanoma_miraclib_pbmc_baseline_boxplots_by_sex(
+    baseline_response_frequencies: pd.DataFrame,
+    path: Path = OUTPUTS_DIR / "melanoma_miraclib_pbmc_baseline_boxplots_by_sex.png",
+) -> None:
+    """Same grouped boxplot + jitter as Part 3, faceted into one panel per sex (M, F)."""
+    sexes = ["M", "F"]
+    fig, axes = plt.subplots(1, len(sexes), figsize=(15, 5), sharey=True)
+
+    for ax, sex in zip(axes, sexes):
+        sex_freq = baseline_response_frequencies.loc[baseline_response_frequencies["sex"] == sex]
+
+        for i, population in enumerate(POPULATION_COLUMNS):
+            resp = sex_freq.loc[
+                (sex_freq.population == population) & (sex_freq.response == "yes"), "percentage"
+            ]
+            non = sex_freq.loc[
+                (sex_freq.population == population) & (sex_freq.response == "no"), "percentage"
+            ]
+
+            bp = ax.boxplot([resp, non], positions=[i - 0.18, i + 0.18], widths=0.32,
+                             patch_artist=True, showfliers=False)
+            for patch, color in zip(bp["boxes"], [COLOR_RESPONDER, COLOR_NON_RESPONDER]):
+                patch.set_facecolor(color)
+                patch.set_alpha(0.35)
+            for median in bp["medians"]:
+                median.set_color("#0b0b0b")
+
+            rng = np.random.default_rng(0)
+            ax.scatter(rng.normal(i - 0.18, 0.03, len(resp)), resp, color=COLOR_RESPONDER, s=10, alpha=0.6)
+            ax.scatter(rng.normal(i + 0.18, 0.03, len(non)), non, color=COLOR_NON_RESPONDER, s=10, alpha=0.6)
+
+        ax.set_xticks(range(len(POPULATION_COLUMNS)))
+        ax.set_xticklabels(POPULATION_COLUMNS)
+        ax.set_title(f"sex = {sex}")
+        ax.grid(axis="y", color="#e1e0d9", linewidth=0.8)
+        ax.set_axisbelow(True)
+        for spine in ["top", "right"]:
+            ax.spines[spine].set_visible(False)
+
+    axes[0].set_ylabel("relative frequency (%)")
+    fig.suptitle("Population frequency by sex: responder vs non-responder (baseline, t=0)")
+
+    handles = [plt.Rectangle((0, 0), 1, 1, facecolor=COLOR_RESPONDER, alpha=0.35),
+               plt.Rectangle((0, 0), 1, 1, facecolor=COLOR_NON_RESPONDER, alpha=0.35)]
+    axes[-1].legend(handles, ["responder", "non-responder"], frameon=False)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
 def save_pca_scatter(pca: pd.DataFrame, path: Path = OUTPUTS_DIR / "pca.png") -> None:
     """2D PCA scatter of each sample's population profile, responder vs non-responder,
     with each group's centroid marked (X) to make the (modest) separation explicit."""
