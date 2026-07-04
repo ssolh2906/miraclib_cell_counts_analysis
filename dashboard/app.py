@@ -4,7 +4,12 @@ from sections import frequencies, overview, stats, subset
 
 st.set_page_config(page_title="miraclib cell counts", layout="wide")
 
-overview.render()
-frequencies.render()
-stats.render()
-subset.render()
+pages = [
+    st.Page(overview.render, title="Overview", icon="📊", url_path="overview", default=True),
+    st.Page(frequencies.render, title="Part 2 · Frequencies", icon="🧬", url_path="frequencies"),
+    st.Page(stats.render, title="Part 3 · Stats", icon="📈", url_path="stats"),
+    st.Page(subset.render, title="Part 4 · Subset", icon="🔬", url_path="subset"),
+]
+
+nav = st.navigation(pages)
+nav.run()
