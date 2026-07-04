@@ -1,0 +1,10 @@
+.git
+.idea
+.claude
+.align_venv
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.ipynb_checkpoints
+notebooks
