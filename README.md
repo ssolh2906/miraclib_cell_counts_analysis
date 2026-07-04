@@ -106,8 +106,15 @@ miraclib_cell_counts_analysis/
 
 ## Part 2 — Cell population frequencies
 
-TODO: brief description of relative frequency calculation, pointer to
-`outputs/cell_frequencies.csv`.
+For each sample, total count = sum of the 5 populations, and each population's relative
+frequency = `count / total_count * 100`. This is computed in SQL by the `cell_frequencies`
+VIEW (see `schema.sql`), so it's always derived from the raw counts, never stored.
+
+Output: `outputs/cell_frequencies.csv` (52,500 rows = 10,500 samples × 5 populations). The
+first five columns are the ones the task asks for — `sample`, `total_count`, `population`,
+`count`, `percentage` — followed by sample metadata (`subject`, `project`, `condition`, `sex`,
+`treatment`, `response`, `sample_type`, `time_from_treatment_start`) that the dashboard and
+later parts reuse.
 
 ---
 
