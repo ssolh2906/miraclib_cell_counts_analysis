@@ -1,3 +1,15 @@
+---
+title: miraclib_cell_counts_analysis
+emoji: 🧬
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+sdk_version: "1.58.0"
+app_file: dashboard/app.py
+pinned: false
+python_version: "3.12"
+---
+
 # miraclib_cell_counts_analysis
 
 This repository is for Teiko's technical exam.
