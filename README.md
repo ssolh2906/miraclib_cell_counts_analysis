@@ -16,6 +16,8 @@ Analysis of `cell-count.csv` (PBMC immune cell populations) to understand how th
 **miraclib** relates to treatment response, using a SQLite database, Python analysis pipeline, and
 an interactive Streamlit dashboard.
 
+**🔗 Live dashboard: https://huggingface.co/spaces/ssol2906/miraclib_cell_counts_analysis**
+
 Python version: **3.12** (see `.python-version`, `.devcontainer/devcontainer.json`).
 
 ---
@@ -125,7 +127,8 @@ non-responders).
 **Method.** For each of the 5 populations I run a Mann-Whitney U test, report an effect size
 (Cliff's delta) and median (IQR), and draw a boxplot. Because 5 populations are
 tested at once, I apply a Benjamini-Hochberg **q-value** in the pipeline — strictly not needed
-given the result, but it can be effective in other dataset.
+given the result, but it can be effective on other datasets.
+
 **Result — no population separates responders at baseline.**
 
 | population | median (R vs NR) | p | q (BH) | Cliff's δ |
@@ -167,7 +170,8 @@ reads as exactly the question it answers. Function and file names spell out the 
 (`melanoma_miraclib_pbmc_baseline_*`) so it's clear what was filtered without reading the body.
 
 I also ran an optional check on this cohort: responder vs non-responder, split by sex, for each
-population, with a boxplot and a Mann-Whitney U p-value. Nothing seems significant (every q bhigher than 0.05), consistent with Part 3. I deliberately tested **relative frequency (%)** here,
+population, with a boxplot and a Mann-Whitney U p-value. Nothing is significant (every q well
+above 0.05), consistent with Part 3. I deliberately tested **relative frequency (%)** here,
 not raw counts — on raw counts female cd4_t_cell looks significant, but that's an artifact of
 responders simply having more total cells, which the compositional (%) view corrects.
 
@@ -180,8 +184,8 @@ Outputs: `outputs/melanoma_miraclib_pbmc_baseline_samples.csv`,
 
 ## Live dashboard
 
+- **Permanent link (Hugging Face Spaces)**: https://huggingface.co/spaces/ssol2906/miraclib_cell_counts_analysis
 - **Codespaces**: `make dashboard` starts Streamlit on port 8501, auto-forwarded by Codespaces.
-- **Permanent link (Hugging Face Spaces)**: TODO — not yet deployed.
 
 ---
 
