@@ -189,4 +189,9 @@ Outputs: `outputs/melanoma_miraclib_pbmc_baseline_samples.csv`,
 
 ## Limitations / future work
 
-TODO: pharmacodynamic (longitudinal t=0→7/14) extension, other stretch ideas.
+- **Timeline extension.** The analysis is baseline-only (t=0). The 7 and 14 day timepoints are
+  already in the schema, so a pharmacodynamic view (how each population shifts on treatment,
+  t=0→7→14) is a natural next step — paired within-subject, not the baseline snapshot.
+- **More universal subset queries.** Part 4 is implemented as separate, explicit queries per
+  requirement. They work, but they could be parameterized (condition, treatment, sample_type,
+  timepoint as arguments) into one reusable function instead of one query per case.
