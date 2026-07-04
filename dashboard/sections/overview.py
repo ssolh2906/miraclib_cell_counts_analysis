@@ -15,8 +15,10 @@ def _cohort_value(cohort, metric, group):
 def render() -> None:
     st.header("Overview")
     st.markdown(
-        "Analysis of PBMC immune-cell populations from **cell-count.csv** to understand how the "
-        "drug candidate **miraclib** relates to treatment response in melanoma patients."
+        "Analysis of immune-cell population counts from **cell-count.csv** to understand how the "
+        "drug candidate **miraclib** relates to treatment response. The full dataset spans several "
+        "conditions (melanoma, carcinoma, healthy), sample types (PBMC, WB), and treatments; the "
+        "statistical work focuses on the **baseline melanoma / miraclib / PBMC cohort** described below."
     )
 
     freq = load_cell_frequencies()

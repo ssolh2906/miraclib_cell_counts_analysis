@@ -9,12 +9,11 @@ from pathlib import Path
 from src.data.repository import (
     get_annotated_cell_counts,
     get_baseline_miraclib_melanoma_pbmc_samples,
-    get_cell_counts,
     get_melanoma_miraclib_pbmc_baseline_samples_per_project,
     get_melanoma_miraclib_pbmc_baseline_subjects_per_response,
     get_melanoma_miraclib_pbmc_baseline_subjects_per_sex,
 )
-from src.domain.frequency import compute_frequencies
+from src.domain.frequency import compute_frequencies_with_metadata
 from src.domain.statistics import (
     compare_responders,
     compute_response_frequencies,
@@ -36,9 +35,13 @@ DB_PATH = Path(__file__).resolve().parent / "cell_counts.db"
 
 
 def generate_frequency_summary(conn: sqlite3.Connection) -> None:
-    """Part 2: frequency summary table, one row per (sample, population)."""
-    counts = get_cell_counts(conn)
-    frequencies = compute_frequencies(counts)
+    """Part 2: frequency summary table, one row per (sample, population).
+
+    Uses annotated counts (with subject/sample metadata) so the exported table
+    carries cohort columns the dashboard filters on.
+    """
+    annotated = get_annotated_cell_counts(conn)
+    frequencies = compute_frequencies_with_metadata(annotated)
     save_cell_frequencies(frequencies)
 
 

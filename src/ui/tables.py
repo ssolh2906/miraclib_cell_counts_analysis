@@ -11,8 +11,19 @@ OUTPUTS_DIR = Path(__file__).resolve().parents[2] / "outputs"
 
 
 def save_cell_frequencies(frequencies: pd.DataFrame, path: Path = OUTPUTS_DIR / "cell_frequencies.csv") -> None:
-    out = frequencies.rename(columns={"sample_id": "sample", "cell_count": "count"})
-    out = out[["sample", "total_count", "population", "count", "percentage"]]
+    """Part 2: per-(sample, population) relative frequency.
+
+    Keeps any subject/sample metadata columns present (subject, project,
+    condition, sex, treatment, response, sample_type, time_from_treatment_start)
+    so the dashboard can filter by cohort. Core frequency columns come first.
+    """
+    out = frequencies.rename(
+        columns={"sample_id": "sample", "cell_count": "count", "project_id": "project", "subject_id": "subject"}
+    )
+    core = ["sample", "total_count", "population", "count", "percentage"]
+    meta = [c for c in ["subject", "project", "condition", "sex", "treatment",
+                        "response", "sample_type", "time_from_treatment_start"] if c in out.columns]
+    out = out[core + meta]
     out["percentage"] = out["percentage"].round(4)
     path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(path, index=False)
