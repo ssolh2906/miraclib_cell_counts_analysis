@@ -10,13 +10,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_curve
 
-from src.domain.vocab import POPULATION_COLUMNS
+from src.domain.vocab import POPULATION_COLORS, POPULATION_COLUMNS
 
 OUTPUTS_DIR = Path(__file__).resolve().parents[2] / "outputs"
-
-# dataviz palette slots 1-5, assigned in the original CSV column order
-_PALETTE = ["#2a78d6", "#1baf7a", "#eda100", "#4a3aa7", "#008300"]
-POPULATION_COLORS = dict(zip(POPULATION_COLUMNS, _PALETTE))
 
 COLOR_RESPONDER = "#2a78d6"
 COLOR_NON_RESPONDER = "#1baf7a"

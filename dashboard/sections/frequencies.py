@@ -1,8 +1,7 @@
 import streamlit as st
 
 from components.data_loading import load_cell_frequencies
-
-POPULATION_ORDER = ["b_cell", "cd4_t_cell", "cd8_t_cell", "nk_cell", "monocyte"]
+from src.domain.vocab import POPULATION_COLUMNS
 
 
 def _multiselect(container, label, series, key):
@@ -57,7 +56,7 @@ def render() -> None:
     m2.metric("Populations", f"{filtered['population'].nunique()}")
     m3.metric("Rows", f"{len(filtered):,}")
 
-    present = [p for p in POPULATION_ORDER if p in filtered["population"].unique()]
+    present = [p for p in POPULATION_COLUMNS if p in filtered["population"].unique()]
 
     st.subheader("Mean frequency by population")
     summary = (
@@ -67,7 +66,12 @@ def render() -> None:
         .round(2)
     )
     c_chart, c_table = st.columns([2, 3])
-    c_chart.bar_chart(summary["mean"], horizontal=True)
+    # st.bar_chart (Vega-Lite) always sorts a nominal axis alphabetically, ignoring
+    # the Series' own index order - number-prefix the labels so that alphabetical
+    # sort happens to match canonical population order.
+    numbered_mean = summary["mean"].copy()
+    numbered_mean.index = [f"{i + 1} {p}" for i, p in enumerate(present)]
+    c_chart.bar_chart(numbered_mean, horizontal=True)
     c_table.dataframe(summary, use_container_width=True)
 
     st.subheader("Per-sample frequencies")

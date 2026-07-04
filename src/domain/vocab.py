@@ -46,3 +46,16 @@ BASELINE = 0
 # The five count columns in the wide CSV, in canonical order.
 # Used by the loader to melt wide -> long and to seed the populations table.
 POPULATION_COLUMNS = [p.value for p in Population]
+
+# Canonical color per population (dataviz palette slots 1-5, in POPULATION_COLUMNS order).
+# Single source of truth for BOTH the pipeline plots (src/ui) and the dashboard.
+_POPULATION_PALETTE = ["#2a78d6", "#1baf7a", "#eda100", "#4a3aa7", "#008300"]
+POPULATION_COLORS = dict(zip(POPULATION_COLUMNS, _POPULATION_PALETTE))
+
+
+def order_populations(values) -> list[str]:
+    """Return the given populations in canonical order (unknown ones appended, stable)."""
+    present = set(values)
+    known = [p for p in POPULATION_COLUMNS if p in present]
+    extra = [v for v in dict.fromkeys(values) if v not in POPULATION_COLUMNS]
+    return known + extra

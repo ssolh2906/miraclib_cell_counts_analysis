@@ -7,7 +7,7 @@ Same predictive-biomarker framing as Part 3 (see src/domain/statistics.py).
 
 import pandas as pd
 
-from src.domain.vocab import BASELINE, Condition, SampleType, Treatment
+from src.domain.vocab import BASELINE, POPULATION_COLUMNS, Condition, SampleType, Treatment
 
 
 def filter_melanoma_miraclib_pbmc_baseline(annotated_counts: pd.DataFrame) -> pd.DataFrame:
@@ -53,4 +53,7 @@ def summarize_population_means(subset: pd.DataFrame) -> pd.DataFrame:
         .round(2)
         .reset_index(name="mean_cell_count")
     )
+    means["population"] = pd.Categorical(means["population"], categories=POPULATION_COLUMNS, ordered=True)
+    means = means.sort_values(["sex", "response", "population"]).reset_index(drop=True)
+    means["population"] = means["population"].astype(str)
     return means

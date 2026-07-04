@@ -4,17 +4,22 @@ Relative cell-type frequency per sample.
 
 import pandas as pd
 
+from src.domain.vocab import POPULATION_COLUMNS
+
 
 def compute_frequencies(counts: pd.DataFrame) -> pd.DataFrame:
     """
     counts: long df with columns ['sample_id', 'population', 'cell_count'].
     returns: columns ['sample_id', 'total_count', 'population', 'cell_count', 'percentage'],
-             sorted by sample_id then population. percentage is full precision (no rounding).
+             sorted by sample_id then population (canonical order). percentage is full
+             precision (no rounding).
     """
     out = counts.copy()
     out["total_count"] = out.groupby("sample_id")["cell_count"].transform("sum")
     out["percentage"] = out["cell_count"] / out["total_count"] * 100
+    out["population"] = pd.Categorical(out["population"], categories=POPULATION_COLUMNS, ordered=True)
     out = out.sort_values(["sample_id", "population"]).reset_index(drop=True)
+    out["population"] = out["population"].astype(str)
     return out[["sample_id", "total_count", "population", "cell_count", "percentage"]]
 
 
@@ -43,7 +48,9 @@ def compute_frequencies_with_metadata(annotated: pd.DataFrame) -> pd.DataFrame:
     out = annotated.copy()
     out["total_count"] = out.groupby("sample_id")["cell_count"].transform("sum")
     out["percentage"] = out["cell_count"] / out["total_count"] * 100
+    out["population"] = pd.Categorical(out["population"], categories=POPULATION_COLUMNS, ordered=True)
     out = out.sort_values(["sample_id", "population"]).reset_index(drop=True)
+    out["population"] = out["population"].astype(str)
     ordered = (
         ["sample_id"]
         + METADATA_COLUMNS

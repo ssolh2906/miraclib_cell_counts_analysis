@@ -1,21 +1,13 @@
 """Charts drawn directly from outputs/*.csv in the dashboard process.
 
 Kept separate from src/ui/plots.py (the pipeline's pre-rendered PNGs) - these
-build a matplotlib Figure from an already-loaded DataFrame so the dashboard
-needs no sys.path import of src (see data_loading.py docstring).
+build a matplotlib Figure from an already-loaded DataFrame.
 """
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# same 5-color assignment as src/ui/plots.py, duplicated here to avoid a src import
-POPULATION_COLORS = {
-    "b_cell": "#2a78d6",
-    "cd8_t_cell": "#1baf7a",
-    "cd4_t_cell": "#eda100",
-    "nk_cell": "#4a3aa7",
-    "monocyte": "#008300",
-}
+from src.domain.vocab import POPULATION_COLORS
 
 
 def cliffs_delta_chart(response_stats: pd.DataFrame) -> plt.Figure:
