@@ -120,9 +120,38 @@ later parts reuse.
 
 ## Part 3 — Responder vs non-responder comparison (melanoma + miraclib + PBMC)
 
-TODO: baseline (t=0) rationale — "immune setpoint" framing, repeated-measures /
-pseudoreplication handling, compositional-data caveat, and summary of results
-(Mann-Whitney U, effect size, BH-adjusted q-value, ROC-AUC, PCA).
+The instruction fixes the cohort: melanoma patients on miraclib, PBMC samples only. I compare
+them at **baseline (t=0)** — the timepoint that matters for prediction. A difference at t=0
+would flag responders *before* treatment even starts (the individual's **immune setpoint**).
+It also keeps the test clean: each subject has 3 timepoints, so
+using only t=0 gives one independent sample per subject (656 subjects, 331 responders / 325
+non-responders).
+
+**Method.** For each of the 5 populations I run a Mann-Whitney U test, report an effect size
+(Cliff's delta) and median (IQR), and draw a boxplot. Because 5 populations are
+tested at once, I apply a Benjamini-Hochberg **q-value** in the pipeline — strictly not needed
+given the result, but it can be effective in other dataset.
+**Result — no population separates responders at baseline.**
+
+| population | median (R vs NR) | p | q (BH) | Cliff's δ |
+|---|---|---|---|---|
+| b_cell     | 9.79 vs 9.76   | 0.55 | 0.89 |  0.03 |
+| cd8_t_cell | 24.40 vs 24.60 | 0.51 | 0.89 | -0.03 |
+| cd4_t_cell | 29.63 vs 29.53 | 0.80 | 0.89 |  0.01 |
+| nk_cell    | 15.00 vs 14.89 | 0.89 | 0.89 | -0.01 |
+| monocyte   | 19.61 vs 20.29 | 0.21 | 0.89 | -0.06 |
+
+Every p is non-significant and every effect size is near zero. Two extra checks agree: PCA of
+the 5-population profile shows the two groups fully overlapping with near-coincident centroids
+(no significant separation), and per-population ROC-AUC sits between 0.47 and 0.51 — right on
+the diagonal, i.e. no better than chance.
+
+So my honest conclusion is that **baseline PBMC frequency alone does not distinguish miraclib
+responders**. It's consistent across the p-value, effect
+size, PCA, and AUC. One caveat worth naming: frequencies are compositional (they sum to 100%
+per sample), so the populations aren't independent.
+Absence of evidence is not evidence of absence. No significant difference here doesn't prove there is none. 
+A rawer or richer signal (single-cell resolution, more markers) or a larger cohort could still surface one that this snapshot can't.
 
 Outputs: `outputs/response_stats.csv`, `outputs/boxplots.png`, `outputs/pca.png`,
 `outputs/roc_curves.png`.
