@@ -197,3 +197,7 @@ Outputs: `outputs/melanoma_miraclib_pbmc_baseline_samples.csv`,
 - **More universal subset queries.** Part 4 is implemented as separate, explicit queries per
   requirement. They work, but they could be parameterized (condition, treatment, sample_type,
   timepoint as arguments) into one reusable function instead of one query per case.
+
+---
+
+*Built by Solhee Tucker, in collaboration with Claude.*
