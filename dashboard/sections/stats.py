@@ -13,13 +13,28 @@ from components.data_loading import (
 def render() -> None:
     st.header("Responder vs. non-responder")
 
+    # Order follows the instruction narrative: (1) boxplot comparison, (2) which
+    # populations differ significantly + statistical evidence, (3) extra evidence.
+    st.subheader("Population frequency: responder vs. non-responder")
+    st.image(str(boxplots_path()))
+
+    st.subheader("Significant populations (baseline, t=0)")
     response_stats = load_response_stats()
-    for chart_fn in (cliffs_delta_chart, p_value_chart, q_value_chart):
-        fig = chart_fn(response_stats)
-        st.pyplot(fig)
-        plt.close(fig)
     st.dataframe(response_stats, use_container_width=True)
 
-    st.image(str(boxplots_path()))
-    st.image(str(pca_path()), caption="PCA of population frequencies, colored by response")
-    st.image(str(roc_curves_path()), caption="Per-population ROC curves for predicting response")
+    fig = cliffs_delta_chart(response_stats)
+    st.pyplot(fig)
+    plt.close(fig)
+
+    c_p, c_q = st.columns(2)
+    fig = p_value_chart(response_stats)
+    c_p.pyplot(fig)
+    plt.close(fig)
+    fig = q_value_chart(response_stats)
+    c_q.pyplot(fig)
+    plt.close(fig)
+
+    st.subheader("Additional evidence")
+    c_pca, c_roc = st.columns(2)
+    c_pca.image(str(pca_path()), caption="PCA of population frequencies, colored by response")
+    c_roc.image(str(roc_curves_path()), caption="Per-population ROC curves for predicting response")

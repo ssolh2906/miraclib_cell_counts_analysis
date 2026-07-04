@@ -16,7 +16,7 @@ def cliffs_delta_chart(response_stats: pd.DataFrame) -> plt.Figure:
     y = list(range(len(populations)))
     colors = [POPULATION_COLORS.get(p, "#898781") for p in populations]
 
-    fig, ax = plt.subplots(figsize=(7, 0.7 * len(populations) + 1))
+    fig, ax = plt.subplots(figsize=(5.5, 0.5 * len(populations) + 0.8))
     ax.hlines(y, 0, response_stats["cliffs_delta"], color=colors, linewidth=2)
     ax.scatter(response_stats["cliffs_delta"], y, color=colors, s=60, zorder=3)
 
@@ -53,14 +53,14 @@ def p_value_chart(response_stats: pd.DataFrame) -> plt.Figure:
     x = list(range(len(populations)))
     colors = [POPULATION_COLORS.get(p, "#898781") for p in populations]
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(4.3, 3))
     ax.bar(x, response_stats["p_value"], color=colors, width=0.6)
     ax.axhline(0.05, color="#c0392b", linewidth=1.2, linestyle="--")
     ax.annotate("p = 0.05", (len(x) - 1, 0.05), xytext=(0, 4), textcoords="offset points",
                 ha="right", fontsize=8, color="#c0392b")
 
     ax.set_xticks(x)
-    ax.set_xticklabels(populations)
+    ax.set_xticklabels(populations, rotation=30, ha="right", fontsize=8)
     ax.set_ylabel("p-value (Mann-Whitney U)")
     ax.set_title("Raw significance by population, baseline (t=0)")
     ax.set_ylim(0, max(1.0, response_stats["p_value"].max() * 1.1))
@@ -77,14 +77,14 @@ def q_value_chart(response_stats: pd.DataFrame) -> plt.Figure:
     x = list(range(len(populations)))
     colors = [POPULATION_COLORS.get(p, "#898781") for p in populations]
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(4.3, 3))
     ax.bar(x, response_stats["q_value"], color=colors, width=0.6)
     ax.axhline(0.05, color="#c0392b", linewidth=1.2, linestyle="--")
     ax.annotate("q = 0.05", (len(x) - 1, 0.05), xytext=(0, 4), textcoords="offset points",
                 ha="right", fontsize=8, color="#c0392b")
 
     ax.set_xticks(x)
-    ax.set_xticklabels(populations)
+    ax.set_xticklabels(populations, rotation=30, ha="right", fontsize=8)
     ax.set_ylabel("BH-adjusted q-value")
     ax.set_title("Significance by population, baseline (t=0)")
     ax.set_ylim(0, max(1.0, response_stats["q_value"].max() * 1.1))
