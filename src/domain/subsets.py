@@ -21,23 +21,22 @@ def filter_baseline_subset(annotated_counts: pd.DataFrame) -> pd.DataFrame:
     return annotated_counts.loc[mask].reset_index(drop=True)
 
 
-def summarize_cohort_counts(subset: pd.DataFrame) -> pd.DataFrame:
+def combine_cohort_counts(
+    samples_per_project: pd.DataFrame,
+    subjects_per_response: pd.DataFrame,
+    subjects_per_sex: pd.DataFrame,
+) -> pd.DataFrame:
     """
-    Tidy (metric, group, value) counts for the baseline subset: sample
-    counts per project, subject counts per response, subject counts per sex.
+    Assemble the three Part 4 count queries (each already filtered/grouped in
+    SQL) into one tidy (metric, group, value) table.
     """
-    samples = subset.drop_duplicates("sample_id")
-    subjects = subset.drop_duplicates("subject_id")
-
     rows = []
-    for project_id, count in samples.groupby("project_id").size().items():
-        rows.append({"metric": "samples_per_project", "group": project_id, "value": count})
-
-    for response, count in subjects.groupby("response").size().items():
-        rows.append({"metric": "subjects_per_response", "group": response, "value": count})
-
-    for sex, count in subjects.groupby("sex").size().items():
-        rows.append({"metric": "subjects_per_sex", "group": sex, "value": count})
+    for _, row in samples_per_project.iterrows():
+        rows.append({"metric": "samples_per_project", "group": row["project_id"], "value": row["sample_count"]})
+    for _, row in subjects_per_response.iterrows():
+        rows.append({"metric": "subjects_per_response", "group": row["response"], "value": row["subject_count"]})
+    for _, row in subjects_per_sex.iterrows():
+        rows.append({"metric": "subjects_per_sex", "group": row["sex"], "value": row["subject_count"]})
 
     return pd.DataFrame(rows)
 

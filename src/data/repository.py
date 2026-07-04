@@ -29,3 +29,55 @@ def get_annotated_cell_counts(conn: sqlite3.Connection) -> pd.DataFrame:
         JOIN subjects subj ON sm.subject_id = subj.subject_id
     """
     return pd.read_sql(query, conn)
+
+
+def get_baseline_miraclib_melanoma_pbmc_samples(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Part 4 step 1: identify all melanoma PBMC samples at baseline (t=0) from
+    patients treated with miraclib. One row per sample."""
+    query = """
+        SELECT sm.sample_id, subj.project_id, subj.subject_id, subj.sex, subj.response
+        FROM samples sm
+        JOIN subjects subj ON sm.subject_id = subj.subject_id
+        WHERE subj.condition = 'melanoma' AND subj.treatment = 'miraclib'
+          AND sm.sample_type = 'PBMC' AND sm.time_from_treatment_start = 0
+    """
+    return pd.read_sql(query, conn)
+
+
+def get_baseline_samples_per_project(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Part 4 extension: sample count per project, within the baseline subset."""
+    query = """
+        SELECT subj.project_id, COUNT(*) AS sample_count
+        FROM samples sm
+        JOIN subjects subj ON sm.subject_id = subj.subject_id
+        WHERE subj.condition = 'melanoma' AND subj.treatment = 'miraclib'
+          AND sm.sample_type = 'PBMC' AND sm.time_from_treatment_start = 0
+        GROUP BY subj.project_id
+    """
+    return pd.read_sql(query, conn)
+
+
+def get_baseline_subjects_per_response(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Part 4 extension: responder/non-responder subject count, within the baseline subset."""
+    query = """
+        SELECT subj.response, COUNT(DISTINCT subj.subject_id) AS subject_count
+        FROM samples sm
+        JOIN subjects subj ON sm.subject_id = subj.subject_id
+        WHERE subj.condition = 'melanoma' AND subj.treatment = 'miraclib'
+          AND sm.sample_type = 'PBMC' AND sm.time_from_treatment_start = 0
+        GROUP BY subj.response
+    """
+    return pd.read_sql(query, conn)
+
+
+def get_baseline_subjects_per_sex(conn: sqlite3.Connection) -> pd.DataFrame:
+    """Part 4 extension: male/female subject count, within the baseline subset."""
+    query = """
+        SELECT subj.sex, COUNT(DISTINCT subj.subject_id) AS subject_count
+        FROM samples sm
+        JOIN subjects subj ON sm.subject_id = subj.subject_id
+        WHERE subj.condition = 'melanoma' AND subj.treatment = 'miraclib'
+          AND sm.sample_type = 'PBMC' AND sm.time_from_treatment_start = 0
+        GROUP BY subj.sex
+    """
+    return pd.read_sql(query, conn)

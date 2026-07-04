@@ -22,6 +22,21 @@ def load_response_stats() -> pd.DataFrame:
     return pd.read_csv(OUTPUTS_DIR / "response_stats.csv")
 
 
+@st.cache_data
+def load_baseline_samples() -> pd.DataFrame:
+    return pd.read_csv(OUTPUTS_DIR / "subset_baseline_samples.csv")
+
+
+@st.cache_data
+def load_cohort_counts() -> pd.DataFrame:
+    return pd.read_csv(OUTPUTS_DIR / "subset_cohort_counts.csv")
+
+
+@st.cache_data
+def load_population_means() -> pd.DataFrame:
+    return pd.read_csv(OUTPUTS_DIR / "subset_population_means.csv")
+
+
 def boxplots_path() -> Path:
     return OUTPUTS_DIR / "boxplots.png"
 

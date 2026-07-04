@@ -30,6 +30,14 @@ def save_response_stats(stats: pd.DataFrame, path: Path = OUTPUTS_DIR / "respons
     out.to_csv(path, index=False)
 
 
+def save_baseline_samples(
+    samples: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_baseline_samples.csv"
+) -> None:
+    """Part 4 step 1: melanoma + miraclib + PBMC samples at baseline (t=0), one row per sample."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    samples.to_csv(path, index=False)
+
+
 def save_cohort_counts(counts: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_cohort_counts.csv") -> None:
     """Part 4 baseline subset: sample counts per project, subject counts per response/sex."""
     path.parent.mkdir(parents=True, exist_ok=True)
