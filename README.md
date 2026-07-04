@@ -3,11 +3,9 @@ title: miraclib_cell_counts_analysis
 emoji: 🧬
 colorFrom: blue
 colorTo: green
-sdk: streamlit
-sdk_version: "1.58.0"
-app_file: dashboard/app.py
+sdk: docker
+app_port: 8501
 pinned: false
-python_version: "3.12"
 ---
 
 # miraclib_cell_counts_analysis
