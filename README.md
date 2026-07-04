@@ -30,9 +30,6 @@ make pipeline   # build cell_counts.db + generate all outputs/ tables & plots
 make dashboard  # launch Streamlit dashboard (localhost:8501)
 ```
 
-TODO: one-paragraph walkthrough of what each step does and what to expect as output
-(console progress logs, files created under `outputs/`).
-
 ---
 
 ## Data schema
