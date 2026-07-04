@@ -160,12 +160,26 @@ Outputs: `outputs/response_stats.csv`, `outputs/boxplots.png`, `outputs/pca.png`
 
 ## Part 4 — Melanoma / miraclib / PBMC baseline subset
 
-TODO: why this subset is implemented as separate SQL queries (one per requirement) rather
-than a single pandas filter, and the headline result (melanoma, male, responder, baseline
-B cell mean).
+**Headline result — melanoma males, responders, baseline: mean B cell count = 10401.28.**
+
+Step 1 identifies the cohort: Melanoma PBMC samples at baseline (t=0) from patients on
+miraclib — 656 samples.
+
+The task says to *query the database and extend the query*, so I wrote each requirement as its
+own SQL query (samples-per-project, subjects-per-response, subjects-per-sex) rather than one
+pandas filter over a dumped table. It keeps the work in SQL where it belongs and each query
+reads as exactly the question it answers. Function and file names spell out the cohort
+(`melanoma_miraclib_pbmc_baseline_*`) so it's clear what was filtered without reading the body.
+
+I also ran an optional check on this cohort: responder vs non-responder, split by sex, for each
+population, with a boxplot and a Mann-Whitney U p-value. Nothing seems significant (every q bhigher than 0.05), consistent with Part 3. I deliberately tested **relative frequency (%)** here,
+not raw counts — on raw counts female cd4_t_cell looks significant, but that's an artifact of
+responders simply having more total cells, which the compositional (%) view corrects.
 
 Outputs: `outputs/melanoma_miraclib_pbmc_baseline_samples.csv`,
-`outputs/subset_cohort_counts.csv`, `outputs/subset_population_means.csv`.
+`outputs/subset_cohort_counts.csv`, `outputs/subset_population_means.csv`,
+`outputs/melanoma_miraclib_pbmc_baseline_response_stats.csv`,
+`outputs/melanoma_miraclib_pbmc_baseline_boxplots_by_sex.png`.
 
 ---
 
