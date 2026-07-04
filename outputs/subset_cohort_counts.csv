@@ -1,0 +1,7 @@
+metric,group,value
+samples_per_project,prj1,384
+samples_per_project,prj3,272
+subjects_per_response,no,325
+subjects_per_response,yes,331
+subjects_per_sex,F,312
+subjects_per_sex,M,344

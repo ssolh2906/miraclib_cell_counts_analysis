@@ -21,33 +21,37 @@ def filter_baseline_subset(annotated_counts: pd.DataFrame) -> pd.DataFrame:
     return annotated_counts.loc[mask].reset_index(drop=True)
 
 
-def summarize_subset(subset: pd.DataFrame) -> pd.DataFrame:
+def summarize_cohort_counts(subset: pd.DataFrame) -> pd.DataFrame:
     """
-    Tidy summary of the baseline subset: sample counts per project, subject
-    counts per response, subject counts per sex, and per-population mean
-    cell count for every (sex, response) group. Part 4's specific question
-    (melanoma males, responders) is one slice of that last table: group="M_yes".
+    Tidy (metric, group, value) counts for the baseline subset: sample
+    counts per project, subject counts per response, subject counts per sex.
     """
     samples = subset.drop_duplicates("sample_id")
     subjects = subset.drop_duplicates("subject_id")
 
     rows = []
     for project_id, count in samples.groupby("project_id").size().items():
-        rows.append({"metric": "samples_per_project", "group": project_id, "population": None, "value": count})
+        rows.append({"metric": "samples_per_project", "group": project_id, "value": count})
 
     for response, count in subjects.groupby("response").size().items():
-        rows.append({"metric": "subjects_per_response", "group": response, "population": None, "value": count})
+        rows.append({"metric": "subjects_per_response", "group": response, "value": count})
 
     for sex, count in subjects.groupby("sex").size().items():
-        rows.append({"metric": "subjects_per_sex", "group": sex, "population": None, "value": count})
-
-    for (sex, response), group_df in subset.groupby(["sex", "response"]):
-        for population, cell_counts in group_df.groupby("population")["cell_count"]:
-            rows.append({
-                "metric": "population_mean",
-                "group": f"{sex}_{response}",
-                "population": population,
-                "value": round(cell_counts.mean(), 2),
-            })
+        rows.append({"metric": "subjects_per_sex", "group": sex, "value": count})
 
     return pd.DataFrame(rows)
+
+
+def summarize_population_means(subset: pd.DataFrame) -> pd.DataFrame:
+    """
+    Mean cell count per population, broken down by sex and response, for the
+    baseline subset. Part 4's specific question (melanoma males, responders)
+    is the row where sex="M", response="yes", population="b_cell".
+    """
+    means = (
+        subset.groupby(["sex", "response", "population"])["cell_count"]
+        .mean()
+        .round(2)
+        .reset_index(name="mean_cell_count")
+    )
+    return means

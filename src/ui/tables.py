@@ -30,7 +30,15 @@ def save_response_stats(stats: pd.DataFrame, path: Path = OUTPUTS_DIR / "respons
     out.to_csv(path, index=False)
 
 
-def save_subset_summary(summary: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_summary.csv") -> None:
-    """Part 4 baseline subset: (metric, group, value) rows, incl. headline B-cell mean."""
+def save_cohort_counts(counts: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_cohort_counts.csv") -> None:
+    """Part 4 baseline subset: sample counts per project, subject counts per response/sex."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    summary.to_csv(path, index=False)
+    counts.to_csv(path, index=False)
+
+
+def save_population_means(
+    means: pd.DataFrame, path: Path = OUTPUTS_DIR / "subset_population_means.csv"
+) -> None:
+    """Part 4 baseline subset: mean cell count per population, by sex and response."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    means.to_csv(path, index=False)

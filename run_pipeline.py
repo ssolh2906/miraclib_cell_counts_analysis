@@ -15,9 +15,9 @@ from src.domain.statistics import (
     pca_projection,
     population_auc,
 )
-from src.domain.subsets import filter_baseline_subset, summarize_subset
+from src.domain.subsets import filter_baseline_subset, summarize_cohort_counts, summarize_population_means
 from src.ui.plots import save_boxplots, save_pca_scatter, save_roc_curves
-from src.ui.tables import save_cell_frequencies, save_response_stats, save_subset_summary
+from src.ui.tables import save_cell_frequencies, save_cohort_counts, save_population_means, save_response_stats
 
 DB_PATH = Path(__file__).resolve().parent / "cell_counts.db"
 
@@ -49,8 +49,8 @@ def analyze_baseline_subset(conn: sqlite3.Connection) -> None:
     """Part 4: melanoma + miraclib + PBMC baseline subset summary."""
     annotated_counts = get_annotated_cell_counts(conn)
     subset = filter_baseline_subset(annotated_counts)
-    summary = summarize_subset(subset)
-    save_subset_summary(summary)
+    save_cohort_counts(summarize_cohort_counts(subset))
+    save_population_means(summarize_population_means(subset))
 
 
 def main() -> None:
