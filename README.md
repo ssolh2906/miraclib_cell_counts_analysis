@@ -37,9 +37,31 @@ TODO: one-paragraph walkthrough of what each step does and what to expect as out
 
 ## Data schema
 
-TODO: rationale for the 3-table schema (`subjects`, `samples`, `cell_counts` long format),
-why population is stored as rows rather than columns, and how this scales to hundreds of
-projects / thousands of samples / new analytics.
+The source `cell-count.csv` is one flat table (1 row = 1 sample). I normalized it into
+**5 tables (3NF)**: `projects → subjects → samples → cell_counts`, plus `populations`
+(a controlled vocabulary of cell types) and a `cell_frequencies` VIEW. Moving subject-level
+fields (`condition`, `sex`, `treatment`, `response`) out of `samples` removes the repetition
+from each subject having up to 3 timepoints.
+
+**Design decisions**
+
+- **Long-format `cell_counts`** — population is a row, not a column. New cell type = zero
+  schema change.
+- **Raw counts only, percentages derived in a VIEW** — `cell_frequencies` computes Part 2 on
+  the fly, so it can't drift out of sync with the counts. Single source of truth.
+- **`CHECK` + `populations` FK** — controlled vocabulary. Bad values rejected at write time.
+- **Natural `TEXT` keys** (`prj1`, `sbj000`) — source IDs used as-is, no surrogate keys.
+
+**Scaling.** I design for extension by default, so growth here is cheap. The cost is a few
+extra tables and joins instead of one flat file — a trade-off against complexity, but I think
+this is the right balance.
+
+- **Hundreds of projects** → add rows to `projects`. No schema change. FK index keeps
+  per-project filtering fast.
+- **Thousands of samples** → every FK column is indexed, so lookups stay index scans. Long
+  format means the data only grows vertically.
+- **Various analytics** → new populations are more rows, new metrics are more VIEWs, new
+  questions are JOIN / GROUP BY. The schema rarely changes to answer a new question.
 
 ### ERD
 
@@ -49,9 +71,36 @@ projects / thousands of samples / new analytics.
 
 ## Code structure
 
-TODO: overview of the `src/data` / `src/domain` / `src/ui` clean-architecture layering, why
-`load_data.py` lives at repo root while its logic is delegated to `src/data/loader.py`, and how
-this keeps the codebase easy to extend one file at a time.
+The main pipeline (`src/`) follows a clean-architecture layering, and the dashboard, tests,
+and pipeline entry points are kept separate.
+
+- **`src/data`** — talks to the outside world (SQLite, CSV). Returns DataFrames.
+- **`src/domain`** — pure computation (frequencies, stats, subsets). Imports neither the DB
+  nor the UI, so it's easy to test and reuse.
+- **`src/ui`** — turns domain results into plots and output tables.
+
+Entry points stay thin and only wire the layers together. `load_data.py` sits at repo root
+(as the task requires) but delegates its logic to `src/data/loader.py`. `run_pipeline.py`
+orchestrates Parts 2–4. The dashboard reads only the CSVs in `outputs/`, so it never
+recomputes or imports `src/`.
+
+```
+miraclib_cell_counts_analysis/
+├── load_data.py            # Part 1 entry point (root, no args) — thin, calls src/data
+├── run_pipeline.py         # Parts 2–4 orchestration (make pipeline)
+├── schema.sql              # DB schema
+├── data/cell-count.csv     # input
+├── outputs/                # generated tables + plots
+├── src/
+│   ├── data/               # DB / CSV I/O, SQL queries
+│   ├── domain/             # pure business logic (no DB, no UI)
+│   └── ui/                 # plots + output-table formatting
+├── dashboard/              # Streamlit app (reads outputs/ only)
+│   ├── app.py
+│   ├── sections/           # overview / frequencies / stats / subset
+│   └── components/         # data loading, charts, filters
+└── tests/                  # unit tests for domain logic
+```
 
 ---
 
