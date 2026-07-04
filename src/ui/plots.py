@@ -62,12 +62,15 @@ def save_boxplots(freq_with_response: pd.DataFrame, path: Path = OUTPUTS_DIR / "
 
 
 def save_pca_scatter(pca: pd.DataFrame, path: Path = OUTPUTS_DIR / "pca.png") -> None:
-    """2D PCA scatter of each sample's population profile, responder vs non-responder."""
+    """2D PCA scatter of each sample's population profile, responder vs non-responder,
+    with each group's centroid marked (X) to make the (modest) separation explicit."""
     fig, ax = plt.subplots(figsize=(6, 6))
 
     for response, color, label in [("yes", COLOR_RESPONDER, "responder"), ("no", COLOR_NON_RESPONDER, "non-responder")]:
         group = pca.loc[pca["response"] == response]
-        ax.scatter(group["pc1"], group["pc2"], color=color, s=14, alpha=0.6, label=label)
+        ax.scatter(group["pc1"], group["pc2"], color=color, s=14, alpha=0.5, label=label)
+        ax.scatter(group["pc1"].mean(), group["pc2"].mean(), color=color, s=90, marker="X",
+                   edgecolor="#0b0b0b", linewidth=0.8, zorder=5)
 
     ax.set_xlabel("PC1")
     ax.set_ylabel("PC2")
