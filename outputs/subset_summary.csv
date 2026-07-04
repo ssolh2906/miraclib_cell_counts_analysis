@@ -1,8 +1,0 @@
-metric,group,value
-samples_per_project,prj1,384.0
-samples_per_project,prj3,272.0
-subjects_per_response,no,325.0
-subjects_per_response,yes,331.0
-subjects_per_sex,F,312.0
-subjects_per_sex,M,344.0
-b_cell_mean,melanoma_male_responder,10401.28
